@@ -1,0 +1,35 @@
+version: '3.1'
+
+volumes:
+  postgresql_data:
+    name: postgresql_data
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data/pgdata
+    ports:
+       - 5432:5432
+
+  backend:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./docker_backend
+    environment:
+      POSTGRES_PASSWORD: example      
+      POSTGRES_HOST: db
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      dockerfile: Dockerfile
+      context: ./docker_frontend
+    ports:
+      - 3000:80
